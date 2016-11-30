@@ -2,9 +2,9 @@
 #include "ensitheora.h"
 #include <pthread.h>
 
+pthread_t theora2sdlthread;
 
 bool fini;
-unsigned int nTextures;
 
 /* les variables pour la synchro, ici */
 
@@ -16,6 +16,7 @@ pthread_cond_t TailleFenetre_cond;
 pthread_mutex_t Fenetre_Texture_m;
 pthread_cond_t Fenetre_Texture_cond;
 
+unsigned int nTextures;
 pthread_mutex_t Info_Texture_m;
 pthread_cond_t plein_cond, vide_cond;
 
@@ -80,14 +81,15 @@ void attendreFenetreTexture() {
 void debutConsommerTexture() {
     pthread_mutex_lock(&Info_Texture_m);
 
+    printf("consommer nTextures : %d\n", nTextures);
     if (nTextures == 0)
-	pthread_cond_wait(&plein_cond, &Info_Texture_m);
+	pthread_cond_wait(&vide_cond, &Info_Texture_m);
 
-    //pthread_mutex_unlock(&Info_Texture_m);
+    pthread_mutex_unlock(&Info_Texture_m);
 }
 
 void finConsommerTexture() {
-    //pthread_mutex_lock(&Info_Texture_m);
+    pthread_mutex_lock(&Info_Texture_m);
 
     nTextures--;
     pthread_cond_signal(&plein_cond);
@@ -101,13 +103,15 @@ void debutDeposerTexture() {
     if (nTextures == NBTEX)
 	pthread_cond_wait(&plein_cond, &Info_Texture_m);
 
-    //pthread_mutex_unlock(&Info_Texture_m);
+    pthread_mutex_unlock(&Info_Texture_m);
 }
 
 void finDeposerTexture() {
-    //pthread_mutex_lock(&Info_Texture_m);
+    pthread_mutex_lock(&Info_Texture_m);
 
     nTextures++;
+
+    printf("fin deposer texture nTextures : %d\n", nTextures);
     pthread_cond_signal(&vide_cond);
 
     pthread_mutex_unlock(&Info_Texture_m);

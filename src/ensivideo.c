@@ -43,10 +43,11 @@ int main(int argc, char *argv[]) {
 
     // tuer les deux threads videos si ils sont bloqués
     pthread_cancel(readertheora);
+    pthread_cancel(theora2sdlthread);
     
     // attendre les 2 threads videos
-    pthread_join(readervorbis, NULL);
     pthread_join(readertheora, NULL);
+    pthread_join(theora2sdlthread, NULL);
     
     exit(EXIT_SUCCESS);    
 }

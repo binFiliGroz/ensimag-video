@@ -117,8 +117,6 @@ int getPacket(struct streamstate *s) {
  */
 
 int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
-    pthread_t draw2SDLthread;
-    
     // if the packet is complete, decode it
     if (respac == 1 && (! s->headersRead) &&
 	s->strtype != TYPE_VORBIS) {
@@ -149,7 +147,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 	    if (type == TYPE_THEORA) {
 		// lancement du thread gérant l'affichage (draw2SDL)
 	        // inserer votre code ici !!
-            pthread_create(&draw2SDLthread, NULL, draw2SDL, (void *) (long long int) (s->serial));
+		     pthread_create(&theora2sdlthread, NULL, draw2SDL, (void *) (long long int) (s->serial));
 
 		    assert(res == 0);		     
 	    }

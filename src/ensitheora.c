@@ -33,6 +33,7 @@ void *draw2SDL(void *arg) {
 			      windowsx,
 			      windowsy,
 			      0);
+    //renderer = SDL_CreateRenderer(screen, -1, 0);
     renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_SOFTWARE);
 	    
     assert(screen);
@@ -76,7 +77,7 @@ void *draw2SDL(void *arg) {
 	}
 
 	debutConsommerTexture();
-  
+ 
 	// Copy the texture with the renderer
 	SDL_SetRenderDrawColor(renderer, 0, 0, 128, 255);
 	SDL_RenderClear(renderer);
