@@ -13,6 +13,7 @@ extern pthread_mutex_t acces_hashmap;
 
 
 /* Fonctions de synchro à implanter */
+void initSynchro();
 
 void envoiTailleFenetre(th_ycbcr_buffer buffer);
 void attendreTailleFenetre();
