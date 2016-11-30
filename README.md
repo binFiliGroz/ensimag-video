@@ -27,8 +27,6 @@ To compile:
 	cd build
 	cmake ..
 	make
-	make test
-	make check
 	```
 
 ## Goal ##

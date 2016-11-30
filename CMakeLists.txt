@@ -22,10 +22,16 @@ if (LOGINS MATCHES "login[123]")
 endif(LOGINS MATCHES "login[123]")
 
 # Trouver la SDL2, ogg, theora et vorbis avec pkgconfig
-execute_process(COMMAND pkg-config --cflags ogg vorbis theora theoradec sdl2 OUTPUT_VARIABLE ALL_PKG_CFLAGS)
-execute_process(COMMAND pkg-config --libs ogg vorbis theora theoradec sdl2 OUTPUT_VARIABLE ALL_PKG_LDFLAGS)
-string(STRIP ${ALL_PKG_LDFLAGS} ALLSTRIP_PKG_CFLAGS)
-string(STRIP ${ALL_PKG_LDFLAGS} ALLSTRIP_PKG_LDFLAGS)
+execute_process(COMMAND bash -c "PKG_CONFIG_PATH=/opt/sdl2-2.0.5/lib/pkgconfig pkg-config --cflags ogg vorbis theora theoradec sdl2" OUTPUT_VARIABLE ALL_PKG_CFLAGS)
+execute_process(COMMAND bash -c "PKG_CONFIG_PATH=/opt/sdl2-2.0.5/lib/pkgconfig pkg-config --libs ogg vorbis theora theoradec sdl2" OUTPUT_VARIABLE ALL_PKG_LDFLAGS)
+string(STRIP "${ALL_PKG_CFLAGS}" ALLSTRIP_PKG_CFLAGS)
+string(STRIP "${ALL_PKG_LDFLAGS}" ALLSTRIP_PKG_LDFLAGS)
+# Le Cflags cenTOS Ensimag descends dans SDL2/
+# Je le supprime pour être homogène dbns le source
+# avec ubuntu et debian
+string(REPLACE "-I/opt/sdl2-2.0.5/include/SDL2" "-I/opt/sdl2-2.0.5/include" ALLSTRIP_PKG_CFLAGS "${ALLSTRIP_PKG_CFLAGS}")
+message(STATUS "cflags: ${ALLSTRIP_PKG_CFLAGS}")
+message(STATUS "ldflags: ${ALLSTRIP_PKG_LDFLAGS}")
 
 
 # Passer le compilateur C à C11 (gnu11) et donner les CFLAGS pour la sdl
