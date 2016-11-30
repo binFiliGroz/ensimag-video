@@ -66,13 +66,18 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
 	// proteger l'accès à la hashmap
 
+    pthread_mutex_lock(&acces_hashmap);
 	if (type == TYPE_THEORA)
 	    HASH_ADD_INT( theorastrstate, serial, s );
 	else
 	    HASH_ADD_INT( vorbisstrstate, serial, s );
 
+    pthread_mutex_unlock(&acces_hashmap);
+
     } else {
 	// proteger l'accès à la hashmap
+    
+    pthread_mutex_lock(&acces_hashmap);
 
 	if (type == TYPE_THEORA)
 	    HASH_FIND_INT( theorastrstate, & serial, s );
@@ -80,6 +85,7 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 	    HASH_FIND_INT( vorbisstrstate, & serial, s );    
 
 	assert(s != NULL);
+    pthread_mutex_unlock(&acces_hashmap);
     }
     assert(s != NULL);
 
@@ -143,9 +149,9 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 	    if (type == TYPE_THEORA) {
 		// lancement du thread gérant l'affichage (draw2SDL)
 	        // inserer votre code ici !!
-            pthread_create(&draw2SDLthread, NULL, draw2SDL, s->serial);
+            pthread_create(&draw2SDLthread, NULL, draw2SDL, (void *) (long long int) (s->serial));
 
-		assert(res == 0);		     
+		    assert(res == 0);		     
 	    }
 	}
     }

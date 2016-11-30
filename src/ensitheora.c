@@ -1,9 +1,11 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <SDL2/SDL.h>
+#include <pthread.h>
 #include "ensitheora.h"
 #include "synchro.h"
 #include "stream_common.h"
+
 
 int windowsx = 0;
 int windowsy = 0;
@@ -31,7 +33,7 @@ void *draw2SDL(void *arg) {
 			      windowsx,
 			      windowsy,
 			      0);
-    renderer = SDL_CreateRenderer(screen, -1, 0);
+    renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_SOFTWARE);
 	    
     assert(screen);
     assert(renderer);
@@ -56,9 +58,9 @@ void *draw2SDL(void *arg) {
 
     /* Protéger l'accès à la hashmap */
 
+    pthread_mutex_lock(&acces_hashmap);
     HASH_FIND_INT( theorastrstate, &serial, s );
-
-
+    pthread_mutex_unlock(&acces_hashmap);
 
     assert(s->strtype == TYPE_THEORA);
     

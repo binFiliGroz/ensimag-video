@@ -2,6 +2,7 @@
 #define STREAM_COMMON_H
 
 #include "ensivideo.h"
+#include <pthread.h>
 
 extern bool fini;
 extern pthread_t theora2sdlthread;

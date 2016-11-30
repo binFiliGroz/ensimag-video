@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <assert.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <pthread.h>
 
 #include "stream_common.h"
 #include "oggstream.h"
@@ -42,8 +43,8 @@ int main(int argc, char *argv[]) {
 
     
     // attendre les 2 threads videos
-    pthread_join(readervorbis);
-    pthread_join(readertheora);
+    pthread_join(readervorbis, &status);
+    pthread_join(readertheora, &status);
     
     exit(EXIT_SUCCESS);    
 }
