@@ -34,7 +34,6 @@ int main(int argc, char *argv[]) {
     pthread_create(&readertheora, NULL, theoraStreamReader, argv[1]);
     pthread_create(&readervorbis, NULL, vorbisStreamReader, argv[1]);
  
-
     // wait audio thread
     pthread_join(readervorbis, &status);
     

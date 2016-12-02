@@ -5,16 +5,15 @@
 pthread_t theora2sdlthread;
 
 bool fini;
-bool tailleFenetreEnvoyee;
-bool fenetrePrete;
+pthread_mutex_t acces_hashmap;
 
 /* les variables pour la synchro, ici */
 
-pthread_mutex_t acces_hashmap;
-
+bool tailleFenetreEnvoyee;
 pthread_mutex_t TailleFenetre_m;
 pthread_cond_t TailleFenetre_cond;
 
+bool fenetrePrete;
 pthread_mutex_t FenetreTexture_m;
 pthread_cond_t FenetreTexture_cond;
 pthread_cond_t FenetreTextureReception_cond;
@@ -47,9 +46,8 @@ void initSynchro() {
 void envoiTailleFenetre(th_ycbcr_buffer buffer) {
     pthread_mutex_lock(&TailleFenetre_m);
 
-    printf("envoi taille fenetre\n");
-    windowsy = buffer[0].height;
-    windowsx = buffer[0].width;
+    windowsy = buffer->height;
+    windowsx = buffer->width;
     tailleFenetreEnvoyee = true;
     pthread_cond_signal(&TailleFenetre_cond);
 
@@ -63,7 +61,6 @@ void attendreTailleFenetre() {
         pthread_cond_wait(&TailleFenetre_cond, &TailleFenetre_m);
 
     tailleFenetreEnvoyee = false;
-    printf("taille fenetre reçue\n");
 
     pthread_mutex_unlock(&TailleFenetre_m);
 }
@@ -80,12 +77,9 @@ void signalerFenetreEtTexturePrete() {
 void attendreFenetreTexture() {
     pthread_mutex_lock(&FenetreTexture_m);
 
-    if (!fenetrePrete) {
-        printf("en attente fenetre\n");
+    if (!fenetrePrete)
         pthread_cond_wait(&FenetreTexture_cond, &FenetreTexture_m);
-    }
     fenetrePrete = false;
-    printf("fenetre reçue\n");
 
     pthread_mutex_unlock(&FenetreTexture_m);
 }
@@ -98,9 +92,8 @@ void attendreFenetreTexture() {
 void debutConsommerTexture() {
     pthread_mutex_lock(&Info_Texture_m);
 
-    printf("debut consommer nTextures : %d\n", nTextures);
     if (nTextures == 0)
-	pthread_cond_wait(&vide_cond, &Info_Texture_m);
+	    pthread_cond_wait(&vide_cond, &Info_Texture_m);
 
     pthread_mutex_unlock(&Info_Texture_m);
 }
@@ -109,10 +102,9 @@ void finConsommerTexture() {
     pthread_mutex_lock(&Info_Texture_m);
 
     nTextures--;
-    printf("fin consommer\n");
     pthread_cond_signal(&plein_cond);
 
-    pthread_cond_signal(&FenetreTexture_cond);
+    signalerFenetreEtTexturePrete();
 
     pthread_mutex_unlock(&Info_Texture_m);
 }
@@ -122,7 +114,6 @@ void debutDeposerTexture() {
 
     if (nTextures == NBTEX)
         pthread_cond_wait(&plein_cond, &Info_Texture_m);
-    printf("debut deposer\n");
 
     pthread_mutex_unlock(&Info_Texture_m);
 }
@@ -131,8 +122,6 @@ void finDeposerTexture() {
     pthread_mutex_lock(&Info_Texture_m);
 
     nTextures++;
-    printf("fin deposer texture nTextures : %d\n", nTextures);
-    pthread_cond_signal(&vide_cond);
 
     pthread_mutex_unlock(&Info_Texture_m);
 }

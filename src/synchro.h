@@ -4,13 +4,12 @@
 #include <stdbool.h>
 #include "ensitheora.h"
 
-extern bool fini;
-
-
 /* Les extern des variables pour la synchro ici */
 
-extern pthread_mutex_t acces_hashmap;
+extern pthread_t theora2sdlthread;
 
+extern bool fini;
+extern pthread_mutex_t acces_hashmap;
 
 /* Fonctions de synchro à implanter */
 void initSynchro();
